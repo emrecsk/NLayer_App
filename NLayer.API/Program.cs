@@ -1,5 +1,6 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NLayer.API.Filters;
 using NLayer.CORE.Repositories;
@@ -37,11 +38,14 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddDataProtection();
+
+var constrBuilder = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("SqlConnection"));
+constrBuilder.Password = builder.Configuration["Password"];
+var connection = constrBuilder.ConnectionString;
 
 builder.Services.AddDbContext<AppDbContext>(x =>
 {
-    x.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"), option =>
+    x.UseSqlServer(connection, option =>
     {
         option.MigrationsAssembly(Assembly.GetAssembly(typeof(AppDbContext)).GetName().Name);
     });

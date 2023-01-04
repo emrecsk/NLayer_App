@@ -38,6 +38,12 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(p =>
+    {
+        p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    })
+);
 
 var constrBuilder = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("SqlConnection"));
 constrBuilder.Password = builder.Configuration["Password"];
@@ -61,7 +67,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors(); //to allow for accessing to api
 app.UseAuthorization();
 
 app.MapControllers();
